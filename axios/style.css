@@ -32,7 +32,9 @@ h2 {
 }
 
 button {
+  display: block;
   padding: 0.8rem 2rem;
+  margin: 1rem 0;
   background-color: #06f;
   color: #fff;
   font-size: 0.9rem;
