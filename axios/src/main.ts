@@ -1,5 +1,5 @@
 import "./style.css";
-import axios from "./lib/axios";
+import axios from "./lib";
 
 const TEST_BASE_URL = "https://jsonplaceholder.typicode.com/";
 const GET_API = "posts/1";
