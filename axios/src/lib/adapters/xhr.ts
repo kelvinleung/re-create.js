@@ -1,8 +1,8 @@
-import { AxiosRequestConfig, AxiosResponse } from "../types";
+import { AxiosRequestConfig, ResponsePromise } from "../types";
 
 export default function xhrAdapter(
   config: AxiosRequestConfig
-): Promise<AxiosResponse> {
+): ResponsePromise {
   return new Promise((resolve, reject) => {
     let request: XMLHttpRequest | null = new XMLHttpRequest();
     request.open(config.method!.toUpperCase(), config.url!);

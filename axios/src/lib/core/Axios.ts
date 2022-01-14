@@ -52,34 +52,29 @@ export default class Axios {
       config.method = "get";
     }
 
-    // 请求拦截器“链”
-    const requestInterceptorChain: InterceptorChain<AxiosRequestConfig>[] = [];
-    this.interceptors.request.forEach((interceptor) => {
-      requestInterceptorChain.unshift(
-        interceptor.fulfilled,
-        interceptor.rejected
-      );
-    });
-    // 响应拦截器“链”
-    const responseInterceptorChain: InterceptorChain<AxiosResponse>[] = [];
-    this.interceptors.response.forEach((interceptor) => {
-      responseInterceptorChain.push(
-        interceptor.fulfilled,
-        interceptor.rejected
-      );
-    });
-
     // 拼接成 [请求拦截器, 请求, 响应拦截器] 请求链
     // undefined 的作用是“占位”，保证两两一组，分别作为 then(onFulfilled, onRejected)
-    let chain: InterceptorChain<any>[] = [dispatchRequest, undefined];
-    chain = requestInterceptorChain.concat(chain);
-    chain = chain.concat(responseInterceptorChain);
+    const chain: InterceptorChain<any>[] = [
+      {
+        fulfilled: dispatchRequest,
+        rejected: undefined,
+      },
+    ];
+    // 请求拦截器“链”，加到头部
+    this.interceptors.request.forEach((interceptor) => {
+      chain.unshift(interceptor);
+    });
+    // 响应拦截器“链”，加到尾部
+    this.interceptors.response.forEach((interceptor) => {
+      chain.push(interceptor);
+    });
 
     let promise: Promise<any> = Promise.resolve(config);
 
     while (chain.length) {
       // 遍历请求链，两两一组链式调用
-      promise = promise.then(chain.shift(), chain.shift());
+      const { fulfilled, rejected } = chain.shift()!;
+      promise = promise.then(fulfilled, rejected);
     }
 
     return promise;

@@ -12,7 +12,7 @@ function createInstance(defaultConfig: AxiosRequestConfig): AxiosStatic {
   utils.extend(instance, Axios.prototype, context);
   // 将 Axios 实例上的属性加到 instance 上
   utils.extend(instance, context);
-  // instance 即为函数，又为对象
+  // instance 既为函数，又为对象
   return instance as AxiosStatic;
 }
 

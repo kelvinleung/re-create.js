@@ -17,20 +17,20 @@ const getMethodExampleButton = document.getElementById(
 
 getExampleButton.addEventListener("click", () => {
   axios(GET_TEST_URL).then((res) => {
-    alert(res);
+    console.log(res);
   });
 });
 
 getInstanceExampleButton.addEventListener("click", () => {
   const instance = axios.create();
   instance.get(GET_TEST_URL).then((res) => {
-    alert(res);
+    console.log(res);
   });
 });
 
 getMethodExampleButton.addEventListener("click", () => {
   axios.get(GET_TEST_URL).then((res) => {
-    alert(res);
+    console.log(res);
   });
 });
 
@@ -43,8 +43,10 @@ interceptorExampleButton.addEventListener("click", () => {
   instance.interceptors.request.use((config) => {
     alert("这是拦截器");
     return config;
-  }, undefined);
+  });
   instance.get(GET_TEST_URL).then((res) => {
-    alert(res);
+    console.log(res);
   });
 });
+
+console.dir(axios);

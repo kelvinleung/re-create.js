@@ -14,8 +14,8 @@ export interface Axios {
 }
 
 export interface AxiosInstance extends Axios {
-  <T = any>(config: AxiosRequestConfig): Promise<T>;
-  <T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  (config: AxiosRequestConfig): ResponsePromise;
+  (url: string, config?: AxiosRequestConfig): ResponsePromise;
 }
 
 export interface AxiosStatic extends AxiosInstance {
@@ -61,11 +61,10 @@ export interface RejectedFn {
 
 export interface Interceptor<T> {
   fulfilled: FulfilledFn<T>;
-  rejected: RejectedFn;
+  rejected?: RejectedFn;
 }
 
-export type InterceptorChain<T> =
-  | FulfilledFn<T>
-  | ((config: AxiosRequestConfig) => ResponsePromise)
-  | RejectedFn
-  | undefined;
+export interface InterceptorChain<T> {
+  fulfilled: FulfilledFn<T> | ((config: AxiosRequestConfig) => ResponsePromise);
+  rejected?: RejectedFn;
+}

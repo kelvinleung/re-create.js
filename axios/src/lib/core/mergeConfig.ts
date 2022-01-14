@@ -1,8 +1,8 @@
 import { AxiosRequestConfig } from "../types";
 
 export default function mergeConfig(
-  config1: AxiosRequestConfig,
-  config2: object
+  to: AxiosRequestConfig,
+  from: object
 ): AxiosRequestConfig {
-  return { ...config1, ...config2 };
+  return { ...to, ...from };
 }

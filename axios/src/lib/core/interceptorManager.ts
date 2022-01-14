@@ -21,6 +21,7 @@ export default class InterceptorManager<T> {
     }
   }
 
+  // null 时不处理
   forEach(fn: (interceptor: Interceptor<T>) => void): void {
     this.handlers.forEach((interceptor) => {
       if (interceptor) {
