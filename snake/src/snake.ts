@@ -20,15 +20,55 @@ export default class Snake {
   private direction: Direction;
   private renderer: Renderer;
 
-  constructor(
-    positions: Array<SnakePosition>,
-    initDirection: Direction,
-    renderer: Renderer
-  ) {
+  constructor(count: number, renderer: Renderer) {
+    const [positions, direction] = this.getRandomPositions(count);
     this.positions = positions;
     this.head = positions[0];
-    this.direction = initDirection;
+    this.direction = direction;
     this.renderer = renderer;
+  }
+
+  private getRandomPositions(count: number): [Array<SnakePosition>, Direction] {
+    const initPosition = Math.floor(count / 2);
+    let initPositions: Array<SnakePosition>;
+    const directions = [
+      Direction.Up,
+      Direction.Down,
+      Direction.Left,
+      Direction.Right,
+    ];
+    const direction = directions[Math.floor(Math.random() * 4)];
+    switch (direction) {
+      case Direction.Up:
+        initPositions = [
+          { x: initPosition, y: initPosition - 1 },
+          { x: initPosition, y: initPosition },
+          { x: initPosition, y: initPosition + 1 },
+        ];
+        break;
+      case Direction.Down:
+        initPositions = [
+          { x: initPosition, y: initPosition + 1 },
+          { x: initPosition, y: initPosition },
+          { x: initPosition, y: initPosition - 1 },
+        ];
+        break;
+      case Direction.Left:
+        initPositions = [
+          { x: initPosition - 1, y: initPosition },
+          { x: initPosition, y: initPosition },
+          { x: initPosition + 1, y: initPosition },
+        ];
+        break;
+      case Direction.Right:
+        initPositions = [
+          { x: initPosition + 1, y: initPosition },
+          { x: initPosition, y: initPosition },
+          { x: initPosition - 1, y: initPosition },
+        ];
+        break;
+    }
+    return [initPositions, direction];
   }
 
   move() {

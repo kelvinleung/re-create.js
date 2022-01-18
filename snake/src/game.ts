@@ -1,33 +1,26 @@
 import Snake, { Direction } from "./snake";
 import Renderer from "./renderer";
 
-const INITIAL_DIRECTION = Direction.Right;
-
 interface Config {
   fps: number;
   count: number;
 }
 
 export default class Game {
+  private isRunning: boolean = false;
   private snake: Snake;
   private loopId?: number;
   private lastTime: number = 0;
   private fps: number;
   private count: number;
-  private isRunning: boolean = false;
 
   constructor(config: Config) {
     this.fps = config.fps;
     this.count = config.count;
 
     const renderer = new Renderer(this.count);
-    const initPosition = Math.floor(this.count / 2);
-    const initPositions = [
-      { x: initPosition - 1, y: initPosition },
-      { x: initPosition, y: initPosition },
-      { x: initPosition + 1, y: initPosition },
-    ];
-    this.snake = new Snake(initPositions, INITIAL_DIRECTION, renderer);
+
+    this.snake = new Snake(this.count, renderer);
 
     renderer.resizeCanvas();
     this.render();
@@ -37,14 +30,6 @@ export default class Game {
       renderer.resizeCanvas();
       this.render();
     });
-  }
-
-  loop(time: number) {
-    this.loopId = requestAnimationFrame(this.loop.bind(this));
-    if (time - this.lastTime < 1000 / this.fps) return;
-    this.lastTime = time;
-    this.snake.move();
-    this.render();
   }
 
   start() {
@@ -62,11 +47,19 @@ export default class Game {
     console.log("stop");
   }
 
-  render() {
+  private loop(time: number) {
+    this.loopId = requestAnimationFrame(this.loop.bind(this));
+    if (time - this.lastTime < 1000 / this.fps) return;
+    this.lastTime = time;
+    this.snake.move();
+    this.render();
+  }
+
+  private render() {
     this.snake.render();
   }
 
-  keyHandler(event: KeyboardEvent) {
+  private keyHandler(event: KeyboardEvent) {
     switch (event.key) {
       case "ArrowUp":
         this.snake.setDirection(Direction.Up);
