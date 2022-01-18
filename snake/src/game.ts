@@ -1,4 +1,5 @@
-import Snake, { Direction } from "./snake";
+import Snake, { Direction, SnakePosition } from "./snake";
+import Food from "./food";
 import Renderer from "./renderer";
 
 interface Config {
@@ -6,9 +7,16 @@ interface Config {
   count: number;
 }
 
+enum GameState {
+  Lose,
+  Food,
+  Move,
+}
+
 export default class Game {
   private isRunning: boolean = false;
   private snake: Snake;
+  private food: Food;
   private loopId?: number;
   private lastTime: number = 0;
   private fps: number;
@@ -21,6 +29,7 @@ export default class Game {
     const renderer = new Renderer(this.count);
 
     this.snake = new Snake(this.count, renderer);
+    this.food = new Food(this.count, renderer);
 
     renderer.resizeCanvas();
     this.render();
@@ -44,19 +53,50 @@ export default class Game {
       this.loopId = undefined;
     }
     this.isRunning = false;
-    console.log("stop");
   }
 
   private loop(time: number) {
     this.loopId = requestAnimationFrame(this.loop.bind(this));
     if (time - this.lastTime < 1000 / this.fps) return;
     this.lastTime = time;
-    this.snake.move();
+    const cell = this.snake.getNextPosition();
+    const state = this.checkState(cell);
+    switch (state) {
+      case GameState.Lose:
+        this.stop();
+        return;
+      case GameState.Food:
+        this.snake.eat(cell);
+        this.food.spawn();
+        break;
+      default:
+        this.snake.move(cell);
+        break;
+    }
     this.render();
   }
 
   private render() {
     this.snake.render();
+    this.food.render();
+  }
+
+  private checkState(cell: SnakePosition): GameState {
+    if (
+      cell.x < 0 ||
+      cell.x >= this.count ||
+      cell.y < 0 ||
+      cell.y >= this.count
+    ) {
+      return GameState.Lose;
+    }
+    if (this.snake.isSnake(cell)) {
+      return GameState.Lose;
+    }
+    if (cell.x === this.food.position.x && cell.y === this.food.position.y) {
+      return GameState.Food;
+    }
+    return GameState.Move;
   }
 
   private keyHandler(event: KeyboardEvent) {

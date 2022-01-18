@@ -1,3 +1,4 @@
+import { FoodPosition } from "./food";
 import Renderer from "./renderer";
 
 const SNAKE_COLOR = "#000";
@@ -71,7 +72,7 @@ export default class Snake {
     return [initPositions, direction];
   }
 
-  move() {
+  getNextPosition(): SnakePosition {
     let nextPosition: SnakePosition;
     switch (this.direction) {
       case Direction.Up:
@@ -91,9 +92,18 @@ export default class Snake {
         throw new Error(exhaustiveCheck);
     }
     const { x, y } = this.head;
-    this.head = { x: x + nextPosition.x, y: y + nextPosition.y };
+    return { x: x + nextPosition.x, y: y + nextPosition.y };
+  }
+
+  move(to: SnakePosition) {
+    this.head = to;
     this.positions.unshift(this.head);
     this.positions.pop();
+  }
+
+  eat(food: FoodPosition) {
+    this.head = food;
+    this.positions.unshift(this.head);
   }
 
   setDirection(direction: Direction) {
@@ -104,6 +114,14 @@ export default class Snake {
     if (direction === Direction.Right && this.direction === Direction.Left)
       return;
     this.direction = direction;
+  }
+
+  isSnake(cell: SnakePosition) {
+    return (
+      this.positions.findIndex(
+        (position) => cell.x === position.x && cell.y === position.y
+      ) > -1
+    );
   }
 
   render() {
