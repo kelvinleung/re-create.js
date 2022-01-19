@@ -15,8 +15,9 @@ enum GameState {
 
 export default class Game {
   private isRunning: boolean = false;
-  private snake: Snake;
-  private food: Food;
+  private snake!: Snake;
+  private food!: Food;
+  private renderer!: Renderer;
   private loopId?: number;
   private lastTime: number = 0;
   private fps: number;
@@ -26,19 +27,18 @@ export default class Game {
     this.fps = config.fps;
     this.count = config.count;
 
-    const renderer = new Renderer(this.count);
-
-    this.snake = new Snake(this.count, renderer);
-    this.food = new Food(this.count, renderer);
-
-    renderer.resizeCanvas();
-    this.render();
-
     window.addEventListener("keydown", this.keyHandler.bind(this));
     window.addEventListener("resize", () => {
-      renderer.resizeCanvas();
+      this.renderer.resizeCanvas();
       this.render();
     });
+  }
+
+  mount(container: HTMLElement) {
+    this.renderer = new Renderer(this.count, container);
+    this.snake = new Snake(this.count, this.renderer);
+    this.food = new Food(this.count, this.renderer);
+    this.renderer.resizeCanvas();
   }
 
   start() {

@@ -1,14 +1,16 @@
 export default class Renderer {
   private count: number;
   private canvasWidth: number = 0;
-  private app: HTMLDivElement;
+  private container: HTMLElement;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
 
-  constructor(count: number) {
+  constructor(count: number, container: HTMLElement) {
     this.count = count;
-    this.app = document.querySelector<HTMLDivElement>("#app")!;
-    this.canvas = document.querySelector<HTMLCanvasElement>("#board")!;
+    this.container = container;
+    this.canvas = document.createElement("canvas");
+    this.canvas.setAttribute("id", "board");
+    container.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d")!;
   }
 
@@ -19,7 +21,10 @@ export default class Renderer {
   }
 
   resizeCanvas() {
-    this.canvasWidth = Math.min(this.app.offsetWidth, this.app.offsetHeight);
+    this.canvasWidth = Math.min(
+      this.container.offsetWidth,
+      this.container.offsetHeight
+    );
     this.canvas.width = this.canvasWidth;
     this.canvas.height = this.canvasWidth;
     this.canvas.style.width = `${this.canvasWidth}px`;
