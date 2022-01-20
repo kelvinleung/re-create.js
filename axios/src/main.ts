@@ -1,5 +1,6 @@
 import "./style.css";
 import axios from "./lib";
+import { Canceler } from "./lib/types";
 
 const TEST_BASE_URL = "https://jsonplaceholder.typicode.com/";
 const GET_API = "posts/1";
@@ -13,6 +14,12 @@ const getInstanceExampleButton = document.getElementById(
 ) as HTMLButtonElement;
 const getMethodExampleButton = document.getElementById(
   "get-example-method"
+) as HTMLButtonElement;
+const cancelExampleButton = document.getElementById(
+  "cancel-example"
+) as HTMLButtonElement;
+const cancelExampleCancelButton = document.getElementById(
+  "cancel-example-cancel"
 ) as HTMLButtonElement;
 
 getExampleButton.addEventListener("click", () => {
@@ -47,6 +54,24 @@ interceptorExampleButton.addEventListener("click", () => {
   instance.get(GET_TEST_URL).then((res) => {
     console.log(res);
   });
+});
+
+let cancel: Canceler;
+
+cancelExampleButton.addEventListener("click", () => {
+  axios(GET_TEST_URL, {
+    cancelToken: new axios.CancelToken((c) => {
+      cancel = c;
+    }),
+  })
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => console.log("err: ", err));
+});
+
+cancelExampleCancelButton.addEventListener("click", () => {
+  cancel("canceled");
 });
 
 console.dir(axios);

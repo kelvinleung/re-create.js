@@ -1,4 +1,5 @@
 import InterceptorManager from "./core/interceptorManager";
+import CancelToken from "./cancel/CancelToken";
 
 export interface Axios {
   defaults: AxiosRequestConfig;
@@ -20,6 +21,7 @@ export interface AxiosInstance extends Axios {
 
 export interface AxiosStatic extends AxiosInstance {
   create(config?: AxiosRequestConfig): AxiosInstance;
+  CancelToken: CancelTokenStatic;
 }
 
 export interface AxiosAdapter {
@@ -37,9 +39,9 @@ export type Method =
   | "PUT";
 
 export interface AxiosRequestConfig {
-  adapter: AxiosAdapter;
   method?: Method;
   url?: string;
+  cancelToken?: CancelToken;
 }
 
 export interface AxiosResponse<T = any> {
@@ -67,4 +69,16 @@ export interface Interceptor<T> {
 export interface InterceptorChain<T> {
   fulfilled: FulfilledFn<T> | ((config: AxiosRequestConfig) => ResponsePromise);
   rejected?: RejectedFn;
+}
+
+export interface Canceler {
+  (message?: string): void;
+}
+
+export interface CancelExecutor {
+  (cancel: Canceler): void;
+}
+
+interface CancelTokenStatic {
+  new (executor: CancelExecutor): CancelToken;
 }

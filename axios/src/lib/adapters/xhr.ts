@@ -4,28 +4,35 @@ export default function xhrAdapter(
   config: AxiosRequestConfig
 ): ResponsePromise {
   return new Promise((resolve, reject) => {
-    let request: XMLHttpRequest | null = new XMLHttpRequest();
-    request.open(config.method!.toUpperCase(), config.url!);
-    request.onreadystatechange = function handleLoad() {
-      if (!request) {
+    const { method, url, cancelToken } = config;
+    let xhr: XMLHttpRequest | null = new XMLHttpRequest();
+    xhr.open(method!.toUpperCase(), url!);
+    xhr.onreadystatechange = function handleLoad() {
+      if (!xhr) {
         return;
       }
-      if (request.readyState !== 4) {
+      if (xhr.readyState !== 4) {
         return;
       }
-      if (request.status >= 200 && request.status < 300) {
+      if (xhr.status >= 200 && xhr.status < 300) {
         const response = {
-          data: request.response,
-          status: request.status,
-          statusText: request.statusText,
+          data: xhr.response,
+          status: xhr.status,
+          statusText: xhr.statusText,
           config,
         };
         resolve(response);
       } else {
-        reject(request.status);
+        reject(xhr.status);
       }
-      request = null;
+      xhr = null;
     };
-    request.send();
+    if (cancelToken) {
+      cancelToken.promise.then((msg) => {
+        xhr!.abort();
+        reject(new Error(msg.message));
+      });
+    }
+    xhr.send();
   });
 }
