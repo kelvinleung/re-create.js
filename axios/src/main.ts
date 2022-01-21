@@ -67,11 +67,9 @@ cancelExampleButton.addEventListener("click", () => {
     .then((res) => {
       console.log(res);
     })
-    .catch((err) => console.log("err: ", err));
+    .catch((err) => console.log(err));
 });
 
 cancelExampleCancelButton.addEventListener("click", () => {
   cancel("canceled");
 });
-
-console.dir(axios);

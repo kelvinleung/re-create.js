@@ -1,3 +1,4 @@
+import Cancel from "../cancel/Cancel";
 import { AxiosRequestConfig, ResponsePromise } from "../types";
 
 export default function xhrAdapter(
@@ -23,14 +24,22 @@ export default function xhrAdapter(
         };
         resolve(response);
       } else {
-        reject(xhr.status);
+        reject(new Error(`${xhr.status}`));
       }
+      xhr = null;
+    };
+    xhr.onabort = function handleAbort() {
+      if (!xhr) {
+        return;
+      }
+      console.log("abort");
+      reject(new Error("Request aborted"));
       xhr = null;
     };
     if (cancelToken) {
       cancelToken.promise.then((msg) => {
+        reject(new Cancel(msg.message));
         xhr!.abort();
-        reject(new Error(msg.message));
       });
     }
     xhr.send();

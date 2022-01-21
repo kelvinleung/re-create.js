@@ -39,6 +39,7 @@ export type Method =
   | "PUT";
 
 export interface AxiosRequestConfig {
+  adapter?: AxiosAdapter;
   method?: Method;
   url?: string;
   cancelToken?: CancelToken;
