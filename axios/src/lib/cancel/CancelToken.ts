@@ -23,7 +23,9 @@ export default class CancelToken {
   }
   static source() {
     let cancel!: Canceler;
-    const token = new CancelToken((c) => (cancel = c));
+    const token = new CancelToken((c) => {
+      cancel = c;
+    });
     return {
       token,
       cancel,
