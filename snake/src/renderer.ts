@@ -1,7 +1,9 @@
 export default class Renderer {
+  // 网格数
   private count: number;
-  private canvasWidth: number = 0;
+  // 挂载 canvas 的元素
   private container: HTMLElement;
+  private canvasWidth: number = 0;
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
 
@@ -15,12 +17,14 @@ export default class Renderer {
   }
 
   drawRect(x: number, y: number, color: string) {
+    // 计算每个格子的宽度
     const gridWidth = this.canvasWidth / this.count;
     this.ctx.fillStyle = color;
     this.ctx.fillRect(x * gridWidth, y * gridWidth, gridWidth, gridWidth);
   }
 
   resizeCanvas() {
+    // 取短边作为画布宽度
     this.canvasWidth = Math.min(
       this.container.offsetWidth,
       this.container.offsetHeight
@@ -32,6 +36,7 @@ export default class Renderer {
   }
 
   clearCanvas() {
+    // 清空画布
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasWidth);
   }
 }
