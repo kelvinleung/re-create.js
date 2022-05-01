@@ -8,6 +8,7 @@ export interface SnakePosition {
   y: number;
 }
 
+// 可移动的方向
 export enum Direction {
   Up,
   Down,
@@ -16,8 +17,11 @@ export enum Direction {
 }
 
 export default class Snake {
+  // 蛇身体每一格的位置
   private positions: Array<SnakePosition>;
+  // 蛇头的位置
   private head: SnakePosition;
+  // 蛇移动的方向
   private direction: Direction;
   private renderer: Renderer;
 
@@ -38,7 +42,9 @@ export default class Snake {
       Direction.Left,
       Direction.Right,
     ];
+    // 随机选择一个移动的方向
     const direction = directions[Math.floor(Math.random() * 4)];
+    // 根据移动方向，初始化蛇的起始位置，长度为3
     switch (direction) {
       case Direction.Up:
         initPositions = [
@@ -73,6 +79,7 @@ export default class Snake {
   }
 
   getNextPosition(): SnakePosition {
+    // 根据移动方向，计算下一个移动的位置
     let nextPosition: SnakePosition;
     switch (this.direction) {
       case Direction.Up:
@@ -96,17 +103,20 @@ export default class Snake {
   }
 
   move(to: SnakePosition) {
+    // 移动，头加尾减，中间不动
     this.head = to;
     this.positions.unshift(this.head);
     this.positions.pop();
   }
 
   eat(food: FoodPosition) {
+    // 吃食物，头加，其它不动
     this.head = food;
     this.positions.unshift(this.head);
   }
 
   setDirection(direction: Direction) {
+    // 判断不能“回头”，只能往前或转弯
     if (direction === Direction.Up && this.direction === Direction.Down) return;
     if (direction === Direction.Down && this.direction === Direction.Up) return;
     if (direction === Direction.Left && this.direction === Direction.Right)
@@ -116,6 +126,7 @@ export default class Snake {
     this.direction = direction;
   }
 
+  // 判断位置是否在蛇体内
   isSnake(cell: SnakePosition) {
     return (
       this.positions.findIndex(
