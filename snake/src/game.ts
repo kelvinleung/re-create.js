@@ -7,6 +7,7 @@ interface Config {
   count: number;
 }
 
+// 游戏当前状态
 enum GameState {
   Lose,
   Food,
@@ -14,19 +15,24 @@ enum GameState {
 }
 
 export default class Game {
+  // 是否暂停
   private isRunning: boolean = false;
   private snake!: Snake;
   private food!: Food;
   private renderer!: Renderer;
+  // requestAnimationFrame 的 id
   private loopId?: number;
   private lastTime: number = 0;
+  // 蛇移动的速度
   private fps: number;
+  // 画布的格子数
   private count: number;
 
   constructor(config: Config) {
     this.fps = config.fps;
     this.count = config.count;
 
+    // 监听按键
     window.addEventListener("keydown", this.keyHandler.bind(this));
     window.addEventListener("resize", () => {
       this.renderer.resizeCanvas();
@@ -34,6 +40,7 @@ export default class Game {
     });
   }
 
+  // 挂载并初始化
   mount(container: HTMLElement) {
     this.renderer = new Renderer(this.count, container);
     this.snake = new Snake(this.count, this.renderer);
@@ -57,10 +64,15 @@ export default class Game {
 
   private loop(time: number) {
     this.loopId = requestAnimationFrame(this.loop.bind(this));
+    // 根据 fps 控制是否移动（重绘速率）
     if (time - this.lastTime < 1000 / this.fps) return;
+    // 上次执行的时间
     this.lastTime = time;
+    // 获取将要移动到的位置
     const cell = this.snake.getNextPosition();
+    // 判断移动位置的游戏状态
     const state = this.checkState(cell);
+    // 根据状态执行相应操作
     switch (state) {
       case GameState.Lose:
         this.stop();
@@ -76,12 +88,14 @@ export default class Game {
     this.render();
   }
 
+  // 渲染蛇与食物
   private render() {
     this.snake.render();
     this.food.render();
   }
 
   private checkState(cell: SnakePosition): GameState {
+    // 超出边界时，游戏结束
     if (
       cell.x < 0 ||
       cell.x >= this.count ||
@@ -90,12 +104,15 @@ export default class Game {
     ) {
       return GameState.Lose;
     }
+    // 碰撞到蛇自身时，游戏结束
     if (this.snake.isSnake(cell)) {
       return GameState.Lose;
     }
+    // 移动到食物上
     if (cell.x === this.food.position.x && cell.y === this.food.position.y) {
       return GameState.Food;
     }
+    // 普通移动
     return GameState.Move;
   }
 
