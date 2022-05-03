@@ -8,6 +8,8 @@ const game = new Game({
   count: 21,
 });
 
+// 挂载并初始化游戏
 game.mount(app);
 
+// 开始游戏
 game.start();
