@@ -95,18 +95,32 @@ function commitWork(fiber) {
   if (!fiber) {
     return;
   }
-  const domParent = fiber.parent.dom;
+
+  let domParentFiber = fiber.parent;
+  while (!domParentFiber.dom) {
+    domParentFiber = domParentFiber.parent;
+  }
+
+  const domParent = domParentFiber.dom;
 
   if (fiber.effectTag === "PLACEMENT" && fiber.dom !== null) {
     domParent.appendChild(fiber.dom);
   } else if (fiber.effectTag === "UPDATE" && fiber.dom !== null) {
     updateDom(fiber.dom, fiber.alternate.props, fiber.props);
   } else if (fiber.effectTag === "DELETION") {
-    domParent.removeChild(fiber.dom);
+    commitDeletion(fiber, domParent);
   }
 
   commitWork(fiber.child);
   commitWork(fiber.sibling);
+}
+
+function commitDeletion(fiber, domParent) {
+  if (fiber.dom) {
+    domParent.removeChild(fiber.dom);
+  } else {
+    commitDeletion(fiber.child, domParent);
+  }
 }
 
 function render(element, container) {
@@ -150,15 +164,14 @@ function workLoop(deadline) {
 requestIdleCallback(workLoop);
 
 function performUnitOfWork(fiber) {
-  // 创建 fiber 对应的 DOM 元素
-  if (!fiber.dom) {
-    fiber.dom = createDom(fiber);
+  // 判断是否为函数组件
+  const isFunctionComponent = fiber.type instanceof Function;
+
+  if (isFunctionComponent) {
+    updateFunctionComponent(fiber);
+  } else {
+    updateHostComponent(fiber);
   }
-
-  // 为所有 children 创建 fiber
-  const elements = fiber.props.children;
-
-  reconcileChildren(fiber, elements);
 
   // 返回下一个 work，有 child 拿 child
   if (fiber.child) {
@@ -173,6 +186,24 @@ function performUnitOfWork(fiber) {
     // 没 sibling 往回找 parent 的 sibling
     nextFiber = nextFiber.parent;
   }
+}
+
+function updateFunctionComponent(fiber) {
+  // 调用函数组件
+  const children = [fiber.type(fiber.props)];
+  reconcileChildren(fiber, children);
+}
+
+function updateHostComponent(fiber) {
+  // 创建 fiber 对应的 DOM 元素
+  if (!fiber.dom) {
+    fiber.dom = createDom(fiber);
+  }
+
+  // 为所有 children 创建 fiber
+  const elements = fiber.props.children;
+
+  reconcileChildren(fiber, elements);
 }
 
 function reconcileChildren(wipFiber, elements) {
